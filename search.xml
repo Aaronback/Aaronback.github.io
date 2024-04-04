@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>Windows核心编程对于临界区的详细描述</title>
+      <link href="/2024/04/04/Windows%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A8%8B%E5%AF%B9%E4%BA%8E%E4%B8%B4%E7%95%8C%E5%8C%BA%E7%9A%84%E8%AF%A6%E7%BB%86%E6%8F%8F%E8%BF%B0/"/>
+      <url>/2024/04/04/Windows%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A8%8B%E5%AF%B9%E4%BA%8E%E4%B8%B4%E7%95%8C%E5%8C%BA%E7%9A%84%E8%AF%A6%E7%BB%86%E6%8F%8F%E8%BF%B0/</url>
+      
+        <content type="html"><![CDATA[<p>临界区是指一个小代码段，在代码执行前能够独占某些资源的访问权；需要注意的是，系统仍然能够控制线程的运行，去安排其他线程。不过，在线程退出临界区之前，系统不会调度其他试图访问相同资源的线程。来看一段代码：</p><pre><code class="c++">const int p = 1000;//对这个全局变量进行操作int g_index = 0;DWORD g_time[p];DWORD WINAPI Thread1(DWORD pParam) &#123;    while (g_index&lt;p)    &#123;        g_time[g_index] = GetTickCount();//检索自系统启动以来经过的毫秒数        g_index++;    &#125;    return 0;&#125;DWORD WINAPI Thread2(DWORD pParam) &#123;    while (g_index &lt; p) &#123;        g_index++;        g_time[g_index - 1] = GetTickCount();    &#125;    return 0;&#125;</code></pre><p>这俩个函数如果单独执行，会产生相同的结果；如果在一个只有一个处理器的机器上跑，系统可能会先调用Thread2，当线程执行完g_index++后，cpu时间片耗尽要切换到Thread1，当这个线程的GetTickCount()获取时间时会将g_thime[1]设置为系统时间，然后再讲cpu分配到Thread2，它会将g_time[0]设置为系统时间；这样时间长的反而会被设置为0，短的设置为1，和预期结果是不一样的，这种线程安全问题会给后期的检查工作带来极大的麻烦。我们使用临界区去解决这个问题：</p><pre><code class="c++">const int p = 1000;//对这个全局变量进行操作int g_index = 0;DWORD g_time[p];CRITICAL_SECTION g_cs;//创建临界区对象DWORD WINAPI Thread1(DWORD pParam) &#123;    while (g_index&lt;p)    &#123;        EnterCriticalSection(&amp;g_cs);//进入临界区        g_time[g_index] = GetTickCount();//检索自系统启动以来经过的毫秒数        g_index++;        LeaveCriticalSection(&amp;g_cs);//离开临界区    &#125;    return 0;&#125;DWORD WINAPI Thread2(DWORD pParam) &#123;    while (g_index &lt; p) &#123;        EnterCriticalSection(&amp;g_cs);//进入临界区        g_index++;        g_time[g_index - 1] = GetTickCount();        LeaveCriticalSection(&amp;g_cs);//离开临界区    &#125;    return 0;</code></pre><p>指定了一个CRITICAL_SECTION 结构用来保护所有的资源，用EnterCriticalSection和LeaveCriticalSection函数将可能会共享资源的代码包裹住，这两个函数都调用了结构体的地址。</p><p>如果有多个不是一道使用的资源，比如1和2访问一个资源，1和3访问另外一个，这样需要为每一个资源创建一个独立的CRITICAL_SECTION结构。这个结构用来标识需要进入的线程，而EnterCriticalSection用来标识这个线程是否有人在使用。要记住在离开临界区时一定要调用LeaveCriticalSection，不然其他线程还是无法访问资源。</p><p>在无法使用互锁函数解决同步问题时，需要用到临界区。临界区的优点是使用容易，在内部使用互锁函数，因此能够快速运行。它的缺点是无法使用它们对多个进程中各个线程进行同步。</p><p>在了解完临界区的第一阶段之后，进入临界区的第二阶段，进入底层了解原理<br>先从第一个疑点，CRITIACAL_SECTION结构说起。当你用F1查看这个结构时，你只能看到结构成员，成员从哪来并不知道。因为微软认为你没有必要了解这个结构。CRITICAL_SECTION在WinNT.h中定义为RTL_CRITICAL_SECTION,这个结构也爱WinBase中做了定义、但是绝不应该编写引用这些成员的代码。</p><p>想要使用CRITIACAL_SECTION结构需要一个windows函数，那这个函数是如何对结构体成员进行操控的？</p><p>使用这个结构体有俩个要求：</p><p>需要访问这个资源的线程必须要知道负责保护线程的CRITICAL_SECTION结构我的地址，这个地址可以使用任何方法获取。<br>CRITICAL_SECTION结构中的成员应该在被访问前对成员进行初始化。函数为VOID IniticlizeCriticalSection(PCRITICAL_SECTION pcs);<br>这个函数只是对结构体的某些成员做了初始化，所以运行并不会失败，如果一个线程进入了一个未初始化的CRITICAL_SECTION结构，后果是不可预测的。<br>当没有线程需要访问资源是，需要调用函数清楚CRITICAL_SECTION结构：VOID DeleteCriticalSection(PCRITION pcs);</p><p>前面说过EnterCriticalSecion怎么使用现在说一下为什么这么使用：这个函数负责查看这个结构体中的成员变量，然后进行如下测试：后面为了方便这个函数使用ECS函数代替；</p><p>如果没有线程访问资源，ECS就更新成员变量。告诉线程能够单独访问这个资源。<br>如果成员变量指明线程已经被赋予对资源的访问权，ECS就更新成员变量，说明线程被赋予了多少次访问权并且立即返回，使现车个继续运行。这种情况很少见，只有当线程在一行中调用俩次ECS函数并且不影响LeaveCriticalSection函数的调用，才会出现这种情况。<br>如果成员变量指明，这个资源在被调用之前就有别的线程获取了访问权，那ECS将调用线程置于等待状态。等待线程不会浪费cpu。当这个资源调用了LeaveCritiolSecton释放资源后，这个线程就会从等待状态恢复为可调度状态。<br>有一种极端情况，如果在多处理器上俩个线程在同一时刻调用ECS函数，那这个函数还有用吗？  答案是有用，还是会将一个线程赋予资源访问权，有一个线程进入等待。因为这个函数的所有测试操作都是以原子方式进行的。<br>如果ECS函数将一个线程置于等待状态，要是在编写不好的程序中这个线程永远不会被调用，这个线程被称为渴求线程。但是在实际操作中，永远也不会出现这种情况。在注册表中CriticalSectionTimeout数据值决定的。如果请求时间超过这个时间，就会产生一个异常条件。这个函数其实可以用更方便的一个函数来代替:BOOL TryEnterCriticalSection(PCRITICAL_SECTION pcs);</p><p>这个不允许进入等待状态，它的返回值能够指明调用线程是否能够获取资源的访问权。如果发现有别的线程在访问资源，句返回FALSE，其他条件都会返回TRUE。要注意的是这个函数在windows 98中并没有实现，调用总会返回FALSE。</p><p>再来认识一个函数：WaitForSingleObject。<br>当WaitForSingleObject函数的第一个参数从未通知状态别为已通知状态时，在这个函数之下的WaitForSingleObject就不会在等待；线程正在运行为未通知状态，反正为已通知；这个函数等待单个对象，WaitForMultipleObjects()函数等待多个对象；第三个参数如果是true，会等待所有线程都执行完才会往下跑，如果是false，只要有任何一个线程变为已通知就会往下跑；</p><p>再来看在结尾处需要调用的函数LeaveCriticalSection函数的使用：这个函数没调用一次计数就会减1，如果这个计数大于0，那么这个函数不做其他操作，只返回。如果为0，就会查看在EnterCriticalSection中是否有其他线程在等待，如果至少有一个线程在等待，它就会先更新成员变量，将其中一个线程变为可调度状态。如果没有线程在等待，这个函数也会更新成员变量说明情况。</p><p>LeaveCriticalSection函数和EnterCriticalSection函数一样都可以以原子操作执行所有这些测试和更新，不过LeaveCriticalSection从不会使线程进入等待状态。当线程进入等待状态时，意味着线程必须从用户模式转为内核状态，这种转换消耗巨大。</p><p>在来看临界区的另外一种情况：在内存不足的情况下，可能会争临界区，同时系统也无法创建必要的事件内核对象，这是EnterCriticalSection会产生一个EXCEPTION_INVALID_HANDLE异常，这种情况非常少见，有俩种方法可以对这种情况进行处理。</p><p>可以使用结构化异常处理方式来跟踪错误。当初五发生时，可以不访问临界区保护的资源，可以等待某些内存变为可用状态时，再次调用EnterCriticalSection函数。<br>可以使用InitializeCriticalSectionAndSpinCount函数创建代码段，函数解释可以在vs中选中按F1进行查看，该函数要确保设置了dwSpinCount参数的高位。如果设置了，就创建事件内核对象。并且在初始化时和临界区关联起来。如果事件无法创建，就返回FALSE。如果事件创建成功，那EnterCriticalSection函数始终都能够运行。<br>关于临界区的使用技巧：<br>1.每个共享资源使用一个CRITICAL_SECTION变量</p><pre><code class="c++">DWORD g_time[100];DWORD g_name[100];CRITICAL_SECTION g_cs;//创建临界区对象DWORD WINAPI Thread1(DWORD pParam) &#123;    EnterCriticalSection(&amp;g_cs);    for (int i = 0; i &lt; 100; i++) &#123;        g_name[i] = 0;    &#125;    for (int i = 0; i &lt; 100; i++) &#123;        g_time[i] = &#39;x&#39;;    &#125;    LeaveCriticalSection(&amp;g_cs);    return 0;&#125;</code></pre><p>这段代码在理论上是讲，俩个数组初始化没有联系，在初始化数组g_name后，另一个只需要访问g_name数组而不是访问g_time数组的线程就可以执行了，同时Thread1可以继续对g_time数组进行初始化，但是这是不可能的，因为用一个临界区保护着这俩个数据结构。这种情况就需要创建俩个临界区分别初始化：</p><pre><code class="c++">DWORD g_time[100];CRITICAL_SECTION g_csTime;//创建临界区对象DWORD g_name[100];CRITICAL_SECTION g_csName;//创建临界区对象DWORD WINAPI Thread1(DWORD pParam) &#123;    EnterCriticalSection(&amp;g_csTime);    for (int i = 0; i &lt; 100; i++) &#123;        g_name[i] = 0;    &#125;    LeaveCriticalSection(&amp;g_csTime);​EnterCriticalSection(&amp;g_csName);​for (int i = 0; i &lt; 100; i++) &#123;​g_time[i] = &#39;x&#39;;​&#125;​LeaveCriticalSection(&amp;g_csName);​return 0;&#125;</code></pre><p>这个代码一旦完成了对g_name数组的初始化，另一个线程就可以开始使用g_name数组。</p><p>2.同时访问多个资源</p><pre><code class="c++">DWORD WINAPI Thread1(DWORD pParam) &#123;    EnterCriticalSection(&amp;g_csTime);    EnterCriticalSection(&amp;g_csName);    for (int i = 0; i &lt; 100; i++) &#123;        g_name[i] = g_time[i];    &#125;        LeaveCriticalSection(&amp;g_csName);    LeaveCriticalSection(&amp;g_csTime);​return 0;&#125;</code></pre><p>如果另外一个函数中的一个进程也要访问这俩个资源：</p><pre><code class="c++">DWORD WINAPI Thread2(DWORD pParam) &#123;    EnterCriticalSection(&amp;g_csName);    EnterCriticalSection(&amp;g_csTime);    for (int i = 0; i &lt; 100; i++) &#123;        g_name[i] = g_time[i];    &#125;        LeaveCriticalSection(&amp;g_csName);    LeaveCriticalSection(&amp;g_csTime);​return 0;&#125;</code></pre><p>这个函数切换了进入临界区的顺序，就有可能产生死锁。Thread1先获得g_csTime的所有权，当线程切换到Thread2时，先获得了g_csName的所有权，当cpu再次到thread1的时候，就会发生死锁，谁都无法获得另一个临界区的所有权。</p><p>解决这个问题，必须始终按照完全相同的顺序请求对资源的访问。</p><p>3.不要在临界区长时间运行同一个线程</p><p>如果无法确定在处理消息需要花费多长时间，可能几个毫秒，可能需要几年。这样的程序就是有问题的。C++</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> windows临界区 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>植物大战僵尸无冷却方式</title>
+      <link href="/2024/04/04/%E6%A4%8D%E7%89%A9%E5%A4%A7%E6%88%98%E5%83%B5%E5%B0%B8%E6%97%A0%E5%86%B7%E5%8D%B4%E6%96%B9%E5%BC%8F/"/>
+      <url>/2024/04/04/%E6%A4%8D%E7%89%A9%E5%A4%A7%E6%88%98%E5%83%B5%E5%B0%B8%E6%97%A0%E5%86%B7%E5%8D%B4%E6%96%B9%E5%BC%8F/</url>
+      
+        <content type="html"><![CDATA[<p><strong>适用于大部分类型游戏，包括stream。</strong><br>要在太阳只够的情况下解决冷却问题，这是他的血量基址 </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041345758.webp"></p><p>用ce收太阳，这里收到俩个值，当然会有很多数据的情况，就需要太阳变动去反复搜索筛选。  </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041345007.webp"></p><p>右键数据是什么该写了这个地址，然后变动太阳，得到这条指令。</p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041345696.png"></p><p>接下来要追的数据是eax的值。点击详细信息，得到eax的值是1EBA5F00（不同的ip可能值会不一样，以自己的为准）。将得到的地址用ce搜索。会得到一堆数据，这里的筛选方法是变动的排除，相似数据较多的全部排除。剩下俩个数据。</p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041345164.webp"></p><p>右键是什么访问了这个地址。会得到很多还在变动的值，ptr标明这是指针，点击详细信息，  </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041352466.png"></p><p>说明这就是最后的地址了。所以最后的偏移是026B9DE8+768+5560.</p><p>现在说冷却的解决方法。<br>这里提供的方法是用0和1搜索，提示：冷却状态为0，无冷却为1。  </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041349861.png"></p><p>这样几个回合下来，数据就剩下5个之内了。这里得到俩个数据，右键是什么改写了这个地址，然后进游戏让第一个元素变动后，会得到这个数据。</p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041355698.png"></p><p>注意，得到的数据要有黑线花的这个数据，如果俩个数据都没有，那就只能重新搜一遍了。之后点击第一条指令。显示反汇编程序，点击工具里的自动反汇编。</p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041356013.png"></p><p>点击模板 —&gt;代码注入,点击ok.  </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041357653.png"></p><p>确定注入就完成了无冷却！是不是有种很爽的感觉。就像这样。  </p><p><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041358744.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 逆向 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 逆向 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
