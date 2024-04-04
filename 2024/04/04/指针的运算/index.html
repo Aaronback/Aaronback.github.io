@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>指针的运算 | 梵音藏心</title><meta name="author" content="Aaron"><meta name="copyright" content="Aaron"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="对于一些教材上说： 指针的指针就是指向指针的指针结构指针就是指向结构的指针数组指针就是指向数组的指针函数指针就是指向函数的指针当你看到函数指针时，指针之间的运算你就已经突破了。 对这些说法展开的讨论： 那这个定义这么写的话，是不是就可以问：指针的指针就一定要指向一个指针，结构指针就一定要指向一个结构….. 1.先看指针的指针，就是二级指针。指针是一种新的数据类型，既然是数据类型，就要知道他的宽度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="指针的运算">
+<meta property="og:url" content="http://example.com/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/index.html">
+<meta property="og:site_name" content="梵音藏心">
+<meta property="og:description" content="对于一些教材上说： 指针的指针就是指向指针的指针结构指针就是指向结构的指针数组指针就是指向数组的指针函数指针就是指向函数的指针当你看到函数指针时，指针之间的运算你就已经突破了。 对这些说法展开的讨论： 那这个定义这么写的话，是不是就可以问：指针的指针就一定要指向一个指针，结构指针就一定要指向一个结构….. 1.先看指针的指针，就是二级指针。指针是一种新的数据类型，既然是数据类型，就要知道他的宽度。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png">
+<meta property="article:published_time" content="2024-04-04T08:25:37.604Z">
+<meta property="article:modified_time" content="2024-04-04T08:31:25.283Z">
+<meta property="article:author" content="Aaron">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png"><link rel="shortcut icon" href="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041235027.png"><link rel="canonical" href="http://example.com/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '指针的运算',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-04-04 16:31:25'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041241023.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="梵音藏心"><span class="site-name">梵音藏心</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">指针的运算</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-04-04T08:25:37.604Z" title="Created 2024-04-04 16:25:37">2024-04-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-04-04T08:31:25.283Z" title="Updated 2024-04-04 16:31:25">2024-04-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/C/">C++</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">2.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>8mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="指针的运算"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><strong>对于一些教材上说：</strong></p>
+<p>指针的指针就是指向指针的指针<br>结构指针就是指向结构的指针<br>数组指针就是指向数组的指针<br>函数指针就是指向函数的指针<br>当你看到函数指针时，指针之间的运算你就已经突破了。</p>
+<p><strong>对这些说法展开的讨论：</strong></p>
+<p>那这个定义这么写的话，是不是就可以问：指针的指针就一定要指向一个指针，结构指针就一定要指向一个结构…..</p>
+<p><strong>1.先看指针的指针，就是二级指针。</strong><br>指针是一种新的数据类型，既然是数据类型，就要知道他的宽度。到目前为止，在32位系统下只要是 * 类型即时4字节，别急，往下看，先来看二级指针的写法：</p>
+<pre><code class="c++">int  a = 1;     //声明一个变量a
+int *p = &amp;a;    //声明一个指针p指向a的地址；
+int **pp=&amp;p;    //声明一个二级指针指向p的地址，
+此时，如果要打印**pp指向的值，那就是1；
+</code></pre>
+<p>在来看一下指针间的运算，运算要在类型确定的情况下才能够进行运算；a - b 的值就等于（a - b）的值 &#x2F; 类型去掉一个 * 号后类型的大小；</p>
+<p>指针加数字&#x2F;指针减数字</p>
+<pre><code class="c++">char* p = (char*)10;
+printf(&quot;%d&quot;,p+1);
+
+char* p=(char*)10;
+printf(&quot;%d&quot;,p-1);
+打印出来的就是11，char*
+</code></pre>
+<p> 类型去掉一个 * 之后的大小就是1；那如果p的类型是int* 类型，那打印出来的就是14;减法是同样的道理，</p>
+<p>指针减指针：</p>
+<pre><code class="c++"> int arr[10] = &#123; 0 &#125;;
+ int *p = &amp;arr[1];     //x+4
+ int *q = &amp;arr[6];     //x+24
+ printf(&quot;%d\n&quot;, p - q);//-5
+</code></pre>
+<p>计算时，要先计算出被减数和减数之间有多少字节，然后用这个字节在除以类型去掉一个 * 之后的大小；所以计算完是-5；那能做减法，能做加法吗？  对于指针来说，地址是编译器分配的，不能确定俩个指针相加完之后的值在不在有效内存上，如果强行让其相加的话，也是可以的，但是没有意义，你的工作是为了利用计算机解决问题，现在好了，你用问题把计算机解决掉了！（补充一点知识，从汇编指令上看，强制转换并不产生实际的计算指令，感兴趣可以去研究一下）</p>
+<p>现在来提升难度，感受被指针支配的恐惧；</p>
+<pre><code class="c++">char* a1;
+char** a2;
+char*** a3;
+printf(&quot;%d\n&quot;,*(a1+2));//+2
+printf(&quot;%d\n&quot;,a1[2]);    //+2
+</code></pre>
+<p>打印的俩种语句的反汇编是一样的，可以自己打印一下，这就说明，数组的计算和指针的技术方式是一样的；他们都是加二，如果把a1替换成a2呢，先char**减去一个 * ，类型大小时4，加2就是加俩个大小为4的类型，就是+8；再来看一种：</p>
+<pre><code class="c++">printf(&quot;%d\n&quot;,*(*(a2+2)+3));
+</code></pre>
+<p>难度上升了一个维度，a2+2加的是8，上一句已经解释了为什么，那来看+3,现在*(a2+2)整体的类型是什么，a2的类型是char** ,那*(a2+2)的类型就是char<em>类型，char</em>类型的值+3就是将char<em>减去一个</em>之后的类型大小，为1，所以就是+3,最后的大小就是a1+8+3;</p>
+<pre><code class="c++">printf(&quot;%d\n&quot;,*(*(*(a3+3)+4)+5));
+</code></pre>
+<p>难度看似有上升了，真的是这样吗？和上边的计算方法如出一辙，它最后的运算是+12+16+5；</p>
+<p>相信我，当你已经不再害怕看到这些东西的时候，那你指针的瓶颈就已经突破了；当你掌握了方法，再多的括号都不是事；</p>
+<p>那现在来回头看上面的代码，仔细看第一步的俩个printf，俩种语句汇编是一样的，所以，下边的俩个printf分别是a2[2][3]，a3[3][4][5]，到现在，你已经学完了一维数组，二维数组，三维数组，那在高维的计算还能不会吗，事实上也不会有人回去声明3维以上的数组的；这些维度的数组计算方式一样的原因是  计算机在实现这些多维数组时，在底层都是一维数组的声明方式，所谓的维度完全是为了方便开发人员，和计算机无关；</p>
+<p>2.结构体指针</p>
+<pre><code class="c++">struct str&#123;
+int a;
+int b;
+&#125;
+int main()
+&#123;
+    str* p;//结构体指针
+    p++;
+&#125;
+</code></pre>
+<p>结构体用好几种不同的声明类型，文章只介绍结构体类型的运算，不包括内存对齐，声明类型这些东西：</p>
+<p>可以计算结构体指针加数字或者减数字，先算出结构体类型的大小，和上别的指针加减法师一样的，str结构体大小为8，那计算就以8为单位计算；</p>
+<p>3.数组指针<br>声明类型为int (<em>p)[ 5 ]，这个要和指针数组区分开，指针数组声明方式是int</em> p[5],因为[]运算符的优先级大于 * ，所以它的重点是数组；而()的优先级大于[],重点强调的是指针，所以前一种类型就是数组指针；</p>
+<pre><code class="c++">int main()&#123;
+    int (*px)[5];
+    printf(&quot;%d\n&quot;,sizeof(px));
+    px=10;
+    px++； 
+    printf(&quot;%d&quot;,px);
+&#125;
+来看sizeof(px)会输出多少，想要知道输出多少，就要知道px的数据类型，每种变量，最重要的就是它的类型。px的类型为int (*
+</code></pre>
+<p>)[5],那它的类型大小就是20，在看下一行的赋值语句，这一行是通不过编译 的，因为10的类型和px的类型不一样，需要强制转换一下：</p>
+<p>px&#x3D;(int (<em>)[5])10;这样才能通过编译；再下一行px++，相当于px+1,上边的指针运算，int (</em>)[5]类型去掉一个 * 之后是int[5],类型大小为20，所以最后输出的px位30；换成char类型也是同样的道理，就是类型大小编程了1,；</p>
+<p>那现在提升难度，多维数组指针，写法是int (*p)[5][5];如果已经了解了多维指针和数组指针，那这个就可以理解为这两种指针类型的结合体，计算方式也八九不离十。直接上题：</p>
+<pre><code class="c++">char str1[]=&#123;0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,
+            0x19,0x11,0x21,0x34,0x23,0x75,0x21,0x33,0x12,0x23&#125;;
+int main()&#123;
+    int (*p1)[5];                //一维数组指针
+    p1 = (int (*)[5])str1;        //给p1赋值
+    printf(&quot;%x\n&quot;,*(*(p1+2)+3));
+    char (*p2)[3][4];            //二维数组指针声明
+    p2 = (char (*)[2][3])str1;   //给p2赋值
+    printf(&quot;%x\n&quot;,*(*(*(p2+2)+3)+4));
+&#125;
+</code></pre>
+<p>那就直接说答案了：第一个输出的是4<em>2</em>5*+4<em>3</em>5 &#x3D; …..不好意思！越界了，数有点大；算术中的4是int的类型大小。就假装得到的值是20，在数组中数的时候，因为是char类型，但是p1是int类型，输出的是 23123321，这里还有一个知识点，就是现在大部分的windows设备都是采用小端存储，就是低地址在高位；</p>
+<p>在来看下边的p2：计算方式是：1<em>2</em>3<em>2+1</em>2<em>3</em>3+1<em>2</em>3<em>4 &#x3D; ……还是比较大，算术中的1代</em>表char类型大小，紧跟着的2*3是数组的[2][3]，2就是+2了，后边也是一样的计算方式；</p>
+<p>从代码中还可以总结到，一维数组想要取值需要俩个 * ，二维数组想要取值需要三个 *；</p>
+<p>4.函数指针<br>先来看函数指针的写法：int (*pFuntion)(int,int);最重要的 它的宽度是  4。</p>
+<pre><code class="c++">int main()&#123; 
+    int (*pFunction)(int,int);
+    pFunction=(int (__cdecl *(int,int)))10;//赋值语句；
+&#125;
+赋值需要转换的类型就是pFunction的类型，这里又有一个小知识，__
+</code></pre>
+<p>cdecl是编译器默认的调用约定，参数传递是从右向左，默认的，所以不写也可以；</p>
+<p>也可以这样赋值：</p>
+<pre><code>int func(int a,int b)&#123;
+    return a+b;
+
+&#125;
+int main()&#123; 
+    int (*pFunction)(int,int);
+    pFunction=func;//赋值语句；
+&#125;
+</code></pre>
+<p>这样应该也能够看懂吧，func的类型正好是(int (*(int,int)))类型，所以不需要强制转换；</p>
+<p><strong>函数指针运算</strong></p>
+<p>加法：进行运算时，要先去掉一个 * 在进行运算，但是，在去掉之后还能确定函数宽度吗？函数的宽度可能是变化的，所以不能进行加法运算，</p>
+<p>减法：emmmmm……让你们失望了，他也不能做减法运算，道理是一样的；又有一个小知识，函数也是全局变量；和找全局变量的 方式是一样的；</p>
+<p>但是，看着这个函数指针确有点鸡肋，不知道什么时候用它，我来总结一下他一般用在什么地方：</p>
+<pre><code class="c++">#include &lt;stdio.h&gt;  
+
+//Calculate用于计算积分。一共三个参数。第一个为函数指针func，指向待积分函数。二三参数为积分上下限  
+double Calculate(double(*func)(double x), double a, double b)  
+&#123;  
+    double dx = 0.0001;//细分的区间长度  
+    double sum = 0;  
+    for (double xi = a+dx; xi &lt;= b; xi+=dx)  
+    &#123;  
+       double area = func(xi)*dx;  
+       sum +=area;  
+    &#125;  
+    return sum;  
+&#125;  
+
+double func_1(double x)  
+&#123;  
+    return x*x;  
+&#125;  
+
+double func_2(double x)  
+&#123;  
+    return x*x*x;  
+&#125;  
+
+void main()  
+&#123;  
+    printf(&quot;%lf\n&quot;, Calculate(func_1, 0, 1));  
+    printf(&quot;%lf\n&quot;, Calculate(func_2, 0, 1));  
+&#125;  
+</code></pre>
+<p>这个是我看别人的…..,原文链接在这里</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wudidajundui/article/details/80411594?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161779085016780274117123%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=161779085016780274117123&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~rank_v29-2-80411594.pc_search_result_cache&utm_term=%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E7%94%A8%E5%A4%84&spm=1018.2226.3001.4187">https://blog.csdn.net/wudidajundui/article/details/80411594?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161779085016780274117123%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&amp;request_id=161779085016780274117123&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~rank_v29-2-80411594.pc_search_result_cache&amp;utm_term=%E5%87%BD%E6%95%B0%E6%8C%87%E9%92%88%E7%94%A8%E5%A4%84&amp;spm=1018.2226.3001.4187</a><br>这个例子确实很经典，但是还有一个就是在加载dll的时候，动态调用dll中的函数可以保证和 dll 中需要调用的函数申明一致；</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Aaron</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/">http://example.com/2024/04/04/指针的运算/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/04/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AF%B9%E7%A7%BB%E4%BD%8D%E7%AC%A6%E7%9A%84%E5%A4%84%E7%90%86/" title="备用APC"><img class="cover" src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041622080.png# 文章封面" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next</div><div class="next_info">备用APC</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041241023.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Aaron</div><div class="author-info__description">梵音藏心</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="tencent://AddContact/?fromId=45&amp;fromSubId=1&amp;subcmd=all&amp;uin=3099145824&amp;website=www.oicqzone.com" target="_blank" title="QQ"><i class="fab fa-qq"></i></a><a class="social-icon" href="mailto:3099145824@qq.com" target="_blank" title="Email"><i class="fas fa-envelope-open-text"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/" title="指针的运算"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="指针的运算"/></a><div class="content"><a class="title" href="/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/" title="指针的运算">指针的运算</a><time datetime="2024-04-04T08:25:37.604Z" title="Created 2024-04-04 16:25:37">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AF%B9%E7%A7%BB%E4%BD%8D%E7%AC%A6%E7%9A%84%E5%A4%84%E7%90%86/" title="备用APC"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041622080.png# 文章封面" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="备用APC"/></a><div class="content"><a class="title" href="/2024/04/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AF%B9%E7%A7%BB%E4%BD%8D%E7%AC%A6%E7%9A%84%E5%A4%84%E7%90%86/" title="备用APC">备用APC</a><time datetime="2024-04-04T08:21:08.509Z" title="Created 2024-04-04 16:21:08">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/RTSP%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/" title="RTSP协议基础详解"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RTSP协议基础详解"/></a><div class="content"><a class="title" href="/2024/04/04/RTSP%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/" title="RTSP协议基础详解">RTSP协议基础详解</a><time datetime="2024-04-04T08:11:04.401Z" title="Created 2024-04-04 16:11:04">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/" title="进程调度重点笔记"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041609294.png# 文章封面" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="进程调度重点笔记"/></a><div class="content"><a class="title" href="/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/" title="进程调度重点笔记">进程调度重点笔记</a><time datetime="2024-04-04T08:05:39.577Z" title="Created 2024-04-04 16:05:39">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/windows%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83/" title="windows系统应用提权"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041608490.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="windows系统应用提权"/></a><div class="content"><a class="title" href="/2024/04/04/windows%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83/" title="windows系统应用提权">windows系统应用提权</a><time datetime="2024-04-04T08:00:36.455Z" title="Created 2024-04-04 16:00:36">2024-04-04</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Aaron</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(r){r.imageLazyLoadSetting.processImages=t;var e=r.imageLazyLoadSetting.isSPA,n=r.imageLazyLoadSetting.preloadRatio||1,c=a();function a(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(){e&&(c=a());for(var t,o=0;o<c.length;o++)0<=(t=(t=c[o]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(r.innerHeight*n||document.documentElement.clientHeight*n)&&function(){var t,e,n,a,i=c[o];e=function(){c=c.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(n=new Image,a=t.getAttribute("data-original"),n.onload=function(){t.src=a,t.removeAttribute("data-original"),e&&e()},t.src!==a&&(n.src=a))}()}function i(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",i),r.addEventListener("resize",i),r.addEventListener("orientationchange",i)}(this);</script></body></html>

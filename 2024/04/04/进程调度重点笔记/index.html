@@ -1,0 +1,176 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>进程调度重点笔记 | 梵音藏心</title><meta name="author" content="Aaron"><meta name="copyright" content="Aaron"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="进程调度重点笔记 1.进程调度追求的目标是什么？达到极小化平均响应时间、极大化系统吞吐率、保存系统各个功能部件处于繁忙状态和提供某种貌似公平的机制。但是，对于不同的操作系统来说达到的目的也会不同。对于批处理系统，不注重用户等待时间。交互式系统要对于响应时间要适当； 2.程序使用CPU的模式有哪几种？它们的特点； 在CPU上执行较长时间；这种称为CPU导向或计算密集型程序，通常用于科学计算方面的程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程调度重点笔记">
+<meta property="og:url" content="http://example.com/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="梵音藏心">
+<meta property="og:description" content="进程调度重点笔记 1.进程调度追求的目标是什么？达到极小化平均响应时间、极大化系统吞吐率、保存系统各个功能部件处于繁忙状态和提供某种貌似公平的机制。但是，对于不同的操作系统来说达到的目的也会不同。对于批处理系统，不注重用户等待时间。交互式系统要对于响应时间要适当； 2.程序使用CPU的模式有哪几种？它们的特点； 在CPU上执行较长时间；这种称为CPU导向或计算密集型程序，通常用于科学计算方面的程序">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041609294.png#%20%E6%96%87%E7%AB%A0%E5%B0%81%E9%9D%A2">
+<meta property="article:published_time" content="2024-04-04T08:05:39.577Z">
+<meta property="article:modified_time" content="2024-04-04T08:12:49.603Z">
+<meta property="article:author" content="Aaron">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041609294.png#%20%E6%96%87%E7%AB%A0%E5%B0%81%E9%9D%A2"><link rel="shortcut icon" href="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041235027.png"><link rel="canonical" href="http://example.com/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: undefined,
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '进程调度重点笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-04-04 16:12:49'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041241023.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="梵音藏心"><span class="site-name">梵音藏心</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">进程调度重点笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-04-04T08:05:39.577Z" title="Created 2024-04-04 16:05:39">2024-04-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-04-04T08:12:49.603Z" title="Updated 2024-04-04 16:12:49">2024-04-04</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word Count:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading Time:</span><span>3mins</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="进程调度重点笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><strong>进程调度重点笔记</strong></p>
+<p>1.进程调度追求的目标是什么？<br>达到极小化平均响应时间、极大化系统吞吐率、保存系统各个功能部件处于繁忙状态和提供某种貌似公平的机制。但是，对于不同的操作系统来说达到的目的也会不同。对于批处理系统，不注重用户等待时间。交互式系统要对于响应时间要适当；</p>
+<p>2.程序使用CPU的模式有哪几种？它们的特点；</p>
+<p>在CPU上执行较长时间；<br>这种称为CPU导向或计算密集型程序，通常用于科学计算方面的程序；<br>CPU执行时间短，大部分用于I&#x2F;O操作；<br>称为I&#x2F;O导向或者输入输出密集型程序；人机交互式到属于这类程序，如游戏程序以及PPT程序；<br>介于二者之间，有较长的CPU执行时间，较长时间的I&#x2F;O操作；<br>称为平衡型程序；如网络浏览器，网络视屏；<br>3.保障调度和时间片轮转的异同点，根本区别是什么？<br>时间片轮转：目的是改善短程序的响应时间，周期性的进行进程切换；其实就是对FCFS算法的改进，一个程序运行一个时间段就切换给别的进程，让个程序都有机会运行；但是频繁的进程切换需要消耗系统时间（切换时间需要把控)；<br>保障调度：就是保障每个进程都能拿到1&#x2F;n的CPU时间；但是可以不需要轮转就能实现；</p>
+<p>根本区别就是保障调度可以不需要轮转，每次给的时间片不一定要一样；<br>4.什么是优先级倒挂？他有什么危害？<br>一个低优先级任务持有一个被高优先级认为所需要的共享资源；这样高优先级任务资源缺乏而受阻，一直到低优先级任务释放资源为止；<br>某些时候并不会造成危害，等到低优先级任务结束后，资源自然会给到高优先级任务；<br>如果阻碍任务较为重要，就可能会导致系统报错；</p>
+<p>5.怎么解决优先级倒挂？<br>优先级倒挂的俩种形式：</p>
+<p>不持有资源的低优先级进程阻碍需要资源的高优先级进程的执行；<br>持有资源的低优先级进程阻碍需要资源的高优先级进程的执行；<br>第一种形式的解决办法：使用中断禁止；<br>通过禁止中断来保护临界区，这种方式会出现俩个优先级：可抢占优先级和中断禁止优先级。前者为一般进程运行时的优先级，后者为运行于临界区进程的优先级。由于系统的锁不能发生乱序，不会发生死锁。又由于进入临界区的进程总是能够不被打断而一直运行到结束，因此也不会发生悬挂；这样，技术高优先级进程采用繁忙等待也不会发生死锁；但是，所用种啊段都必须禁止，如果禁止的只是一个硬件设备中断，能硬件的中断优先处理机制将再次引入优先级倒挂；<br>在多CPU环境下，不能使用中断禁止，就有另外一种方式，单一共享标志锁，<br>第二种形式的解决办法：优先级上限(priority ceiling)<br>中断禁止可以防止第一种优先级倒挂，但是无法避免第二种。想要避免就不能让低优先级进程持有高优先级进程所需要的资源。思路就是让共享的临界区有自己的优先级，并让访问临界区的进程获得临界区的优先级，只要临界区的优先级设置的够高，就可以避免；但是试图访问mutex的程序具有高于mutex的优先级还是可能发生倒挂；</p>
+<p>要完全杜绝倒挂，就需要在任何时候都确保等待资源的进程具有的优先级必须低于持有资源的进程的优先级。如何实现呢？就是优先级继承（priority inheritance）:<br>当一个高优先级进程等待一个低优先进程所持有的资源时，这个低优先级进程抢占低优先级进程而延长资源占用时间，同时也防止了因高优先进程自身进行繁忙等待可能导致的死锁。在释放共享资源后，低优先级进程回到其原来的优先级别；<br>6.如果最后一个进程在CPU任务结束后由很长一段时间的I&#x2F;O操作，在计算CPU响应时间时是否应该计入该I&#x2F;O操作耗时？<br>不算；<br>具体原因…</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="http://example.com">Aaron</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="http://example.com/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/">http://example.com/2024/04/04/进程调度重点笔记/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041609294.png# 文章封面" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/04/04/RTSP%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/" title="RTSP协议基础详解"><img class="cover" src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">RTSP协议基础详解</div></div></a></div><div class="next-post pull-right"><a href="/2024/04/04/windows%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83/" title="windows系统应用提权"><img class="cover" src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041608490.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next</div><div class="next_info">windows系统应用提权</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041241023.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Aaron</div><div class="author-info__description">梵音藏心</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="tencent://AddContact/?fromId=45&amp;fromSubId=1&amp;subcmd=all&amp;uin=3099145824&amp;website=www.oicqzone.com" target="_blank" title="QQ"><i class="fab fa-qq"></i></a><a class="social-icon" href="mailto:3099145824@qq.com" target="_blank" title="Email"><i class="fas fa-envelope-open-text"></i></a></div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/" title="指针的运算"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="指针的运算"/></a><div class="content"><a class="title" href="/2024/04/04/%E6%8C%87%E9%92%88%E7%9A%84%E8%BF%90%E7%AE%97/" title="指针的运算">指针的运算</a><time datetime="2024-04-04T08:25:37.604Z" title="Created 2024-04-04 16:25:37">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AF%B9%E7%A7%BB%E4%BD%8D%E7%AC%A6%E7%9A%84%E5%A4%84%E7%90%86/" title="备用APC"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041622080.png# 文章封面" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="备用APC"/></a><div class="content"><a class="title" href="/2024/04/04/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AF%B9%E7%A7%BB%E4%BD%8D%E7%AC%A6%E7%9A%84%E5%A4%84%E7%90%86/" title="备用APC">备用APC</a><time datetime="2024-04-04T08:21:08.509Z" title="Created 2024-04-04 16:21:08">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/RTSP%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/" title="RTSP协议基础详解"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041555434.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RTSP协议基础详解"/></a><div class="content"><a class="title" href="/2024/04/04/RTSP%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/" title="RTSP协议基础详解">RTSP协议基础详解</a><time datetime="2024-04-04T08:11:04.401Z" title="Created 2024-04-04 16:11:04">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/" title="进程调度重点笔记"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041609294.png# 文章封面" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="进程调度重点笔记"/></a><div class="content"><a class="title" href="/2024/04/04/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A6%E9%87%8D%E7%82%B9%E7%AC%94%E8%AE%B0/" title="进程调度重点笔记">进程调度重点笔记</a><time datetime="2024-04-04T08:05:39.577Z" title="Created 2024-04-04 16:05:39">2024-04-04</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/04/04/windows%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83/" title="windows系统应用提权"><img src="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg" data-original="https://raw.githubusercontent.com/Aaronback/picgo/main/202404041608490.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="windows系统应用提权"/></a><div class="content"><a class="title" href="/2024/04/04/windows%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%8F%90%E6%9D%83/" title="windows系统应用提权">windows系统应用提权</a><time datetime="2024-04-04T08:00:36.455Z" title="Created 2024-04-04 16:00:36">2024-04-04</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://raw.githubusercontent.com/Aaronback/picgo/main/202404041248835.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Aaron</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">Search</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  Loading the Database</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(e.href.match(t)||e.href.match(r))&&(e.href=a.dataset.original)})});</script><script>!function(r){r.imageLazyLoadSetting.processImages=t;var e=r.imageLazyLoadSetting.isSPA,n=r.imageLazyLoadSetting.preloadRatio||1,c=a();function a(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(){e&&(c=a());for(var t,o=0;o<c.length;o++)0<=(t=(t=c[o]).getBoundingClientRect()).bottom&&0<=t.left&&t.top<=(r.innerHeight*n||document.documentElement.clientHeight*n)&&function(){var t,e,n,a,i=c[o];e=function(){c=c.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(n=new Image,a=t.getAttribute("data-original"),n.onload=function(){t.src=a,t.removeAttribute("data-original"),e&&e()},t.src!==a&&(n.src=a))}()}function i(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",i),r.addEventListener("resize",i),r.addEventListener("orientationchange",i)}(this);</script></body></html>
